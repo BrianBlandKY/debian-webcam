@@ -33,4 +33,4 @@ bin/
 Debug/
 Release/
 obj/
-
+.metadata/

@@ -26,3 +26,11 @@
 *.exe
 *.out
 *.app
+
+
+# Directories
+bin/
+Debug/
+Release/
+obj/
+

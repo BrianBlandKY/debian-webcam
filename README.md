@@ -1,2 +1,2 @@
-# dimples-monitor
-Debian based C++ application to capture audio/video from a webcam source.
+# dimples-video
+Cross platform audio/video capture and stream

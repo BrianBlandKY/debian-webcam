@@ -1,10 +1,11 @@
-#include "../inc/Video4Linux2.hpp"
+#include "Video4Linux2.hpp"
 
 Video4Linux2::Video4Linux2():IODevice()
 {
 	isRunning = false;
 	size.height = 360;
 	size.width = 640;
+	data = nullptr;
     buffer = nullptr;
 }
 
@@ -194,7 +195,7 @@ Video4Linux2::InitBufferMap(int fd)
         return 1;
     }
 
-    buffer = mmap (NULL, buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, buf.m.offset);
+    buffer = (uint8_t*)mmap (NULL, buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, buf.m.offset);
     printf("Length: %d\nAddress: %p\n", buf.length, buffer);
     printf("Image Length: %d\n", buf.bytesused);
 

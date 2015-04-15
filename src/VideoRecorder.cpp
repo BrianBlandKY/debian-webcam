@@ -1,4 +1,4 @@
-#include "../inc/VideoRecorder.hpp"
+#include "VideoRecorder.hpp"
 
 VideoRecorder::VideoRecorder(io::IODevice* device){
 	this->filename = "";

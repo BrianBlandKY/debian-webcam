@@ -7,9 +7,9 @@
 #include <opencv2/opencv.hpp>
 #include <time.h>
 
-#include "../inc/Video4Linux2.hpp"
-#include "../inc/OpenCVPreview.hpp"
-#include "../inc/VideoRecorder.hpp"
+#include "Video4Linux2.hpp"
+#include "OpenCVPreview.hpp"
+#include "VideoRecorder.hpp"
 
 using namespace std;
 

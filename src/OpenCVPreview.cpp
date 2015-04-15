@@ -1,4 +1,4 @@
-#include "../inc/OpenCVPreview.hpp"
+#include "OpenCVPreview.hpp"
 
 OpenCVPreview::OpenCVPreview(io::IODevice* device){
 	this->device = device;

@@ -10,17 +10,27 @@ SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS := $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 
 DEBUG = -g
-INCLUDES = -I./include
-INCLUDES += -I/home/developer/3rdParty/boost/include
-INCLUDES += -I/home/developer/3rdParty/ffmpeg/include
+INCLUDES = -I/usr/local/include
+INCLUDES += -I./inc
 
-LIBS = -L/usr/lib/x86_64-linux-gnu 
-LIBS += -L/usr/local/lib
-LIBS += -L/home/developer/3rdParty/boost/lib
-LIBS += -L/home/developer/3rdParty/ffmpeg/lib
+LIBS = -L/usr/lib/x86_64-linux-gnu
 LIBS += -lboost_regex
+LIBS += -lboost_system -lboost_thread
+LIBS += -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_video -lopencv_videostab
+LIBS += -lavcodec \
+		-lavformat \
+        -lavutil \
+        -lavdevice \
+        -lavfilter \
+        -lswscale \
+        -lswresample \
+        # -lavresample \
 
-CFLAGS = -c -std=c++0x -fexceptions
+# PortAudio Libs
+#-lportaudio \
+
+
+CFLAGS = -c -std=c++0x -fexceptions -D__STDC_CONSTANT_MACROS
 CFLAGS += -Wall $(DEBUG) $(INCLUDES)
 LDFLAGS =
 

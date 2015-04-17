@@ -1,12 +1,13 @@
 #include "Video4Linux2.hpp"
 
-Video4Linux2::Video4Linux2():IODevice()
+Video4Linux2::Video4Linux2(const char* dev):IODevice()
 {
 	isRunning = false;
 	size.height = 360;
 	size.width = 640;
-	data = nullptr;
-    buffer = nullptr;
+	device = dev;
+    buffer = NULL;
+    fd = 0;
 }
 
 Video4Linux2::~Video4Linux2()
@@ -14,35 +15,34 @@ Video4Linux2::~Video4Linux2()
 	delete buffer;
 }
 
-void Video4Linux2::Start(io_callback cb, void* data)
+int
+Video4Linux2::Init()
 {
-	Start("/dev/video0", cb, data);
-}
-
-void
-Video4Linux2::Start(const char* device, io_callback cb, void* data)
-{
-	this->data = data;
-	int fd;
-
 	fd = open(device, O_RDWR);
 	if (fd == -1)
 	{
 		perror("Opening video device");
-		return; // 1
+		return fd;
 	}
-	if(SetPixelFormat(fd))
-		return;
+	if(SetPixelFormat())
+		return fd;
 	// Not required, general details
-	if(PrintCameraInfo(fd))
-		return;
-	if(InitBufferMap(fd))
-		return;
+	if(PrintCameraInfo())
+		return fd;
+	if(InitBufferMap())
+		return fd;
+	return 0;
+}
+
+int
+Video4Linux2::Start(io_callback cb, void* data)
+{
+	int fd;
 
 	try{
 		do{
-			if(CaptureImage(fd, cb))
-				return;
+			if(CaptureImage(cb, data))
+				return fd;
 		}while(isRunning);
 	}
 	catch(boost::thread_interrupted &err){
@@ -54,13 +54,12 @@ Video4Linux2::Start(const char* device, io_callback cb, void* data)
 
 	close(fd);
 
-	return;
+	return 0;
 }
 
 void
 Video4Linux2::Stop(){
     this->isRunning = false;
-    delete buffer;
 }
 
 int
@@ -75,13 +74,13 @@ Video4Linux2::xioctl(int fd, int request, void *arg)
 }
 
 int
-Video4Linux2::SetPixelFormat(int fd)
+Video4Linux2::SetPixelFormat()
 {
 	char fourcc[5] = {0};
 	struct v4l2_format fmt = {};
 	fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	fmt.fmt.pix.width = 640;
-	fmt.fmt.pix.height = 360;
+	fmt.fmt.pix.width = size.width;
+	fmt.fmt.pix.height = size.height;
 	fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
 	/*
 	 * $ v4l2-ctl --list-devices (list all web cam devices)
@@ -111,7 +110,7 @@ Video4Linux2::SetPixelFormat(int fd)
 }
 
 int
-Video4Linux2::PrintCameraInfo(int fd)
+Video4Linux2::PrintCameraInfo()
 {
 	struct v4l2_capability caps = {};
 	if (-1 == xioctl(fd, VIDIOC_QUERYCAP, &caps))
@@ -172,7 +171,7 @@ Video4Linux2::PrintCameraInfo(int fd)
 }
 
 int
-Video4Linux2::InitBufferMap(int fd)
+Video4Linux2::InitBufferMap()
 {
     struct v4l2_requestbuffers req = {0};
     req.count = 1;
@@ -203,16 +202,17 @@ Video4Linux2::InitBufferMap(int fd)
 }
 
 int
-Video4Linux2::CaptureImage(int fd, io_callback cb)
+Video4Linux2::CaptureImage(io_callback cb, void* data)
 {
 	fd_set fds;
     struct v4l2_buffer buf = {0};
     buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     buf.memory = V4L2_MEMORY_MMAP;
     buf.index = 0;
+
     if(-1 == xioctl(fd, VIDIOC_QBUF, &buf))
     {
-        perror("Query Buffer");
+        perror("Query Buffer2");
         return 1;
     }
 
@@ -228,6 +228,7 @@ Video4Linux2::CaptureImage(int fd, io_callback cb)
 		FD_SET(fd, &fds);
 		isRunning = true;
     }
+
 	struct timeval tv = {0};
 	tv.tv_sec = 2;
 	int r = select(fd+1, &fds, NULL, NULL, &tv);
@@ -241,11 +242,11 @@ Video4Linux2::CaptureImage(int fd, io_callback cb)
 		perror("Retrieving Frame");
 		return 1;
 	}
-	if(cb != nullptr){
+	if(cb != NULL){
 		Message msg;
 		msg.buffer = (void*)buffer;
 		msg.size = size;
-		msg.data = this->data;
+		msg.data = data;
 
 		cb(msg);
 	}
@@ -256,6 +257,6 @@ Video4Linux2::CaptureImage(int fd, io_callback cb)
 io::Size
 Video4Linux2::GetSize()
 {
-	 return size;
+	return size;
 }
 

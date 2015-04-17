@@ -21,25 +21,28 @@ using namespace io;
 class Video4Linux2 : virtual public IODevice
 {
 public:
-	Video4Linux2();
+	Video4Linux2(const char* device);
     ~Video4Linux2();
-    void Start(const char* device, io_callback cb, void* data);
-    void Start(io_callback cb, void* data);
+    int Start(io_callback cb, void* data);
     void Stop();
+    int Init();
     io::Size GetSize();
 
 private:
     // Default camera settings for best FrameRate (25+ FPS)
     // 1280 x 720 will reduce FPS by 1/2 (not ideal)
+    static int xioctl(int fd, int request, void *arg);
+
     bool isRunning;
+    int fd;
     Size size;
     uint8_t *buffer;
-    void* data;
-    static int xioctl(int fd, int request, void *arg);
-    int PrintCameraInfo(int fd);
-    int InitBufferMap(int fd);
-    int CaptureImage(int fd, io_callback cb);
-    int SetPixelFormat(int fd);
+    const char* device;
+
+    int PrintCameraInfo();
+    int InitBufferMap();
+    int CaptureImage(io_callback cb, void* data);
+    int SetPixelFormat();
 };
 
 #endif /* VIDEO4LINUX2_HPP_ */

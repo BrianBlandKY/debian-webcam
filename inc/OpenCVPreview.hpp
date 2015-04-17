@@ -18,6 +18,7 @@ public:
     void Stop();
 private:
     io::IODevice* device;
+    boost::thread cameraThread;
     void ThreadStart();
     static void Callback(io::Message);
 };

@@ -23,14 +23,13 @@ LIBS += -lavcodec \
         -lavdevice \
         -lavfilter \
         -lswscale \
-        -lswresample \
+        -lswresample
         # -lavresample \
 
 # PortAudio Libs
 #-lportaudio \
 
-
-CFLAGS = -c -std=c++0x -fexceptions -D__STDC_CONSTANT_MACROS
+CFLAGS = -c -std=c++11 -fexceptions -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS 
 CFLAGS += -Wall $(DEBUG) $(INCLUDES)
 LDFLAGS =
 

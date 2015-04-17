@@ -11,7 +11,7 @@ OpenCVPreview::~OpenCVPreview(){
 void
 OpenCVPreview::Callback(io::Message msg){
 	IplImage* frame;
-	CvMat cvmat = cvMat(360, 640, CV_8UC3, msg.buffer);
+	CvMat cvmat = cvMat(msg.size.height, msg.size.width, CV_8UC3, msg.buffer);
 
 	frame = cvDecodeImage(&cvmat, 1);
 	cvNamedWindow("window",CV_WINDOW_AUTOSIZE);
@@ -23,18 +23,28 @@ OpenCVPreview::Callback(io::Message msg){
 void
 OpenCVPreview::ThreadStart()
 {
-	device->Start(&OpenCVPreview::Callback, (void*)this);
+	try
+	{
+		device->Start(&OpenCVPreview::Callback, (void*)this);
+	}
+	catch(boost::thread_interrupted &err){
+		std::cout << "closing camera..." << std::endl;
+	}
+	catch(std::exception &ex){
+		std::cout << "unexpected err " << ex.what() << std::endl;
+	}
 }
 
 void
 OpenCVPreview::Start()
 {
-	boost::thread cameraThread(&OpenCVPreview::ThreadStart, this);
+	cameraThread = boost::thread(&OpenCVPreview::ThreadStart, this);
 }
 
 void
 OpenCVPreview::Stop()
 {
 	device->Stop();
+	cameraThread.interrupt();
 }
 

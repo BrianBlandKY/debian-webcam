@@ -1,10 +1,6 @@
 #ifndef MUXTOOL_HPP
 #define MUXTOOL_HPP
 
-#ifdef WIN64
-#define snprintf _snprintf
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -15,15 +15,15 @@ using namespace std;
 
 int main()
 {
-	//Video4Linux2* device = new Video4Linux2("/dev/video0");
+	Video4Linux2* device = new Video4Linux2("/dev/video0");
 
-	//device->Init();
+	device->Init();
 
 	//OpenCVPreview* preview = new OpenCVPreview(device);
-	//VideoRecorder* recorder = new VideoRecorder(device);
+	VideoRecorder* recorder = new VideoRecorder(device);
 
 	//preview->Start();
-	//recorder->Start("test.mpeg");
+	recorder->Start("test.mpeg");
 
 	string input;
 	while(input != "x")
@@ -33,7 +33,7 @@ int main()
 	}
 
 	//preview->Stop();
-	//recorder->Stop();
+	recorder->Stop();
 
 	//delete device;
 	//delete preview;

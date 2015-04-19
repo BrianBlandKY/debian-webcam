@@ -20,16 +20,16 @@ VideoRecorder::Callback(io::Message msg){
 
 		avpicture_fill((AVPicture*)frame,
 					  (uint8_t *)msg.buffer,
-					  AV_PIX_FMT_NONE, //PIX_FMT_RGB24, //PIX_FMT_YUVJ420P
+					  PIX_FMT_YUVJ422P, //PIX_FMT_RGB24, //PIX_FMT_YUVJ420P
 					  msg.size.width,
 					  msg.size.height);
 
-		frame->format = AV_PIX_FMT_NONE;
+		frame->format = PIX_FMT_YUVJ422P;
 		frame->height = msg.size.height;
 		frame->width = msg.size.width;
 
 		recorder->muxTool->WriteVideoFrame(frame);
-		recorder->muxTool->SaveFrame("test.ppm", frame, msg.size.width, msg.size.height);
+		//recorder->muxTool->SaveFrame("test.ppm", frame, msg.size.width, msg.size.height);
 	}
 	catch(boost::thread_interrupted &err){
 		std::cout << "closing camera..." << std::endl;

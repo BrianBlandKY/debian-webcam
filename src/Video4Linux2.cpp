@@ -84,7 +84,8 @@ Video4Linux2::SetPixelFormat()
 	fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
 	/*
 	 * $ v4l2-ctl --list-devices (list all web cam devices)
-	 * $ v4l2-ctl --list-formats (list web cam formats) (iSight->MJPEG only!)
+	 * $ v4l2-ctl --list-formats (list web cam formats) (MJPEG is only option for VM)
+	 * Consider reviewing when working with real hardware
 	 */
 
 	fmt.fmt.pix.field = V4L2_FIELD_NONE;
@@ -244,7 +245,7 @@ Video4Linux2::CaptureImage(io_callback cb, void* data)
 	}
 	if(cb != NULL){
 		Message msg;
-		msg.buffer = (void*)buffer;
+		msg.buffer = (void *)buffer;
 		msg.size = size;
 		msg.data = data;
 
